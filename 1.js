@@ -83,7 +83,7 @@ var parseArr = function(arr){
 				crypto = lastBalance[1]; USD = lastBalance[2]; action = "stay in USD"; // остаемся в USD
 			};
 		};
-		balance.push( [lastBalance[0] + crypto * msell[i] + USD, crypto, USD, action] );
+		balance.push( [crypto * msell[i] + USD, crypto, USD, action] );
 	};
 	console.log('balance', balance);
 
