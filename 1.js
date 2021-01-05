@@ -1,6 +1,6 @@
 var h = {"sell": {}, "buy": {}};
 var maxTime = 0;
-var delta = 15;
+var delta = 1;
 
 var parseArr = function(arr){
 	for(var i=0; i<arr.length; i++) {
@@ -48,24 +48,42 @@ var parseArr = function(arr){
 	console.log(mas);
 
 	var GreenRedsell = mas.sell.map((i,ind) => {return (ind && mas.sell[ind-1]>1) ? "BTC": "USD"});
-	var mx = Object.keys(h.sell).sort();
-	var mx2 = mx[mx.length-1];
-	var priceSel = h.sell[mx2].s.toFixed(2);
+	var msell = Object.keys(h.sell).sort();
+	var msell2 = msell[msell.length-1];
+	var priceSel = h.sell[msell2].s.toFixed(2);
 	var node = document.forms[1].elements.price;
 	console.log(priceSel, node.value, mas.sell[mas.sell.length-1],GreenRedsell);
 	node.value = priceSel;
 
 	var GreenRedbuy = mas["buy"].map((i,ind) => {return (ind && mas["buy"][ind-1]>1) ? "BTC": "USD"});
-	var mb = Object.keys(h.buy).sort();
-	var mb2 = mb[mb.length-1];
-	var priceBuy = h.buy[mb2].s.toFixed(2);
+	var mbuy = Object.keys(h.buy).sort();
+	var mbuy2 = mbuy[mbuy.length-1];
+	var priceBuy = h.buy[mbuy2].s.toFixed(2);
 	node = document.forms[0].elements.price;
 	console.log(priceBuy, node.value, mas.buy[mas.buy.length-1],GreenRedbuy);
 	node.value = priceBuy;
 
-	var balance = 100;
+	var balance = [[100,0,100,"stay in USD"],[100,0,100,"stay in USD"]];
 	for(i=2; i<mas["sell"].length; i++){
-		if (mas["sell"][i-1]>1)	balance *= mas["sell"][i];
+		var lastBalance = balance[i-1], crypto = 0, USD = 0, action = "";
+		if (mas["sell"][i-1]>1)	{ 		// на предыдущем периоде курс рос
+			if (mas["sell"][i-2]>1)	{ 	// на предыдущем периоде портфель был в крипте
+				crypto = lastBalance[1]; USD = lastBalance[2]; action = "stay in crypto"; // остаемся в USD
+			}
+			else {							// на предыдущем периоде портфель был в USD
+				crypto = lastBalance[2] / mbuy[i-1]; USD = 0; action = "buy crypto"; // покупаем крипту
+			};
+		}
+		else {								// на предыдущем периоде курс падал
+			if (mas["sell"][i-2]>1)	{ 	// на предыдущем периоде портфель был в крипте
+												// продаем крипту
+				crypto = 0; USD = lastBalance[1] * msell[i-1]; action = "sell crypto"; // покупаем крипту
+			}
+			else {							// на предыдущем периоде портфель был в USD
+				crypto = lastBalance[1]; USD = lastBalance[2]; action = "stay in USD"; // остаемся в USD
+			};
+		};
+		balance.push( [lastBalance[0] + crypto * msell[i] + USD, crypto, USD, action] );
 	};
 	console.log('balance', balance);
 
