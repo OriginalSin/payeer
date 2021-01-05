@@ -50,11 +50,18 @@ var parseArr = function(arr){
 	var GreenRedsell = mas.sell.map((i,ind) => {return (ind && mas.sell[ind-1]>1) ? "BTC": "USD"});
 	var mx = Object.keys(h.sell).sort();
 	var mx2 = mx[mx.length-1];
-	console.log(h.sell[mx2].s.toFixed(2), mas.sell[mas.sell.length-1],GreenRedsell);
+	var priceSel = h.sell[mx2].s.toFixed(2);
+	var node = document.forms[0].elements.price;
+	console.log(priceSel, node.value, mas.sell[mas.sell.length-1],GreenRedsell);
+	node.value = priceSel;
+
 	var GreenRedbuy = mas["buy"].map((i,ind) => {return (ind && mas["buy"][ind-1]>1) ? "BTC": "USD"});
 	var mb = Object.keys(h.buy).sort();
 	var mb2 = mb[mb.length-1];
-	console.log(h.buy[mb2].s.toFixed(2), mas.buy[mas.buy.length-1],GreenRedbuy);
+	var priceBuy = h.buy[mb2].s.toFixed(2);
+	node = document.forms[1].elements.price;
+	console.log(priceBuy, node.value, mas.buy[mas.buy.length-1],GreenRedbuy);
+	node.value = priceBuy;
 
 	var balance = 100;
 	for(i=2; i<mas["sell"].length; i++){
