@@ -51,7 +51,7 @@ var parseArr = function(arr){
 	var mx = Object.keys(h.sell).sort();
 	var mx2 = mx[mx.length-1];
 	var priceSel = h.sell[mx2].s.toFixed(2);
-	var node = document.forms[0].elements.price;
+	var node = document.forms[1].elements.price;
 	console.log(priceSel, node.value, mas.sell[mas.sell.length-1],GreenRedsell);
 	node.value = priceSel;
 
@@ -59,7 +59,7 @@ var parseArr = function(arr){
 	var mb = Object.keys(h.buy).sort();
 	var mb2 = mb[mb.length-1];
 	var priceBuy = h.buy[mb2].s.toFixed(2);
-	node = document.forms[1].elements.price;
+	node = document.forms[0].elements.price;
 	console.log(priceBuy, node.value, mas.buy[mas.buy.length-1],GreenRedbuy);
 	node.value = priceBuy;
 
