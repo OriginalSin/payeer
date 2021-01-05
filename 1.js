@@ -11,8 +11,8 @@ var parseArr = function(arr){
 		if (timeKey <= maxTime) continue;
 		var hh = h[tm] || {s:0, n:0};
 		h[tm] = {
-			s: hh.s + Number(arr[i+1].replace(',','')),
-			n: hh.n + 1
+			s: hh.s + Number(arr[i+2].replace(',','')),
+			n: hh.n + Number(arr[i+3].replace(',',''))
 		};
 	};
 	//console.log(h);
