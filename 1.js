@@ -1,6 +1,6 @@
 var h = {"sell": {}, "buy": {}};
 var maxTime = 0;
-var delta = 1;
+var delta = 5;
 
 var parseArr = function(arr){
 	for(var i=0; i<arr.length; i++) {
