@@ -95,6 +95,15 @@ var parseArr = function(arr){
 
 };
 
+var submitForm = function(flag) {	// submitForm(0) - Купить Crypto	submitForm(1) - Продать Crypto
+	var form = document.forms[flag ? 1 : 0];
+	var buttons = form.getElementsByTagName('button');
+	var buttonSubm = buttons[4];
+	var button100p = buttons[3];
+	button100p.click();
+	buttonSubm.click();
+};
+
 var getArr = function(){
 	let nodeArray = document.getElementsByClassName('trade-management__history-main-items');
 	node0 = nodeArray[0];
