@@ -154,6 +154,7 @@ var getArr = function(){
 		};
 	};
 	console.log(ind, priceSellPrev, priceSell, priceBuy, lastBal);
+	console.log("---------------------", maxTime, ---------------------\n");
 };
 
 setInterval(getArr, 1000*60);
