@@ -1,6 +1,7 @@
 var h = {"sell": {}, "buy": {}};
 var maxTime = 0;
-var delta = 5;
+var delta = 10;
+var ind = -1, lastBal = [100,0,100], priceSell = 1, priceSellPrev, priceBuy = 1;
 
 var parseArr = function(arr){
 	for(var i=0; i<arr.length; i++) {
@@ -50,15 +51,17 @@ var parseArr = function(arr){
 	var GreenRedsell = mas.sell.map((i,ind) => {return (ind && mas.sell[ind-1]>1) ? "BTC": "USD"});
 	var msell = Object.keys(h.sell).sort();
 	var msell2 = msell[msell.length-1];
-	var priceSel = h.sell[msell2].s.toFixed(2);
+	priceSellPrev = priceSell;
+	priceSell = Number(h.sell[msell2].s.toFixed(2));
 	var node = document.forms[1].elements.price;
-	console.log(priceSel, node.value, mas.sell[mas.sell.length-1],GreenRedsell);
-	node.value = priceSel;
+	console.log(priceSell, node.value, mas.sell[mas.sell.length-1],GreenRedsell);
+	node.value = priceSell;
 
 	var GreenRedbuy = mas["buy"].map((i,ind) => {return (ind && mas["buy"][ind-1]>1) ? "BTC": "USD"});
 	var mbuy = Object.keys(h.buy).sort();
 	var mbuy2 = mbuy[mbuy.length-1];
-	var priceBuy = h.buy[mbuy2].s.toFixed(2);
+	priceBuy = Number(h.buy[mbuy2].s.toFixed(2));
+	console.log('Здесь у нас прайсы',priceSellPrev, priceSell, priceBuy);
 	node = document.forms[0].elements.price;
 	console.log(priceBuy, node.value, mas.buy[mas.buy.length-1],GreenRedbuy);
 	node.value = priceBuy;
@@ -69,18 +72,22 @@ var parseArr = function(arr){
 		if (mas["sell"][i-1]>1)	{ 		// на предыдущем периоде курс рос
 			if (mas["sell"][i-2]>1)	{ 	// на предыдущем периоде портфель был в крипте
 				crypto = lastBalance[1]; USD = lastBalance[2]; action = "stay in crypto"; // остаемся в USD
+				ind = -1;
 			}
 			else {							// на предыдущем периоде портфель был в USD
 				crypto = lastBalance[2] / mbuy[i-1]; USD = 0; action = "buy crypto"; // покупаем крипту
+				ind = 0;
 			};
 		}
 		else {								// на предыдущем периоде курс падал
 			if (mas["sell"][i-2]>1)	{ 	// на предыдущем периоде портфель был в крипте
 												// продаем крипту
-				crypto = 0; USD = lastBalance[1] * msell[i-1]; action = "sell crypto"; // покупаем крипту
+				crypto = 0; USD = lastBalance[1] * msell[i-1]; action = "sell crypto"; // продаем крипту
+				ind = 1;
 			}
 			else {							// на предыдущем периоде портфель был в USD
 				crypto = lastBalance[1]; USD = lastBalance[2]; action = "stay in USD"; // остаемся в USD
+				ind = -1;
 			};
 		};
 		balance.push( [crypto * msell[i] + USD, crypto, USD, action] );
@@ -92,7 +99,7 @@ var parseArr = function(arr){
 		if (mas.sell[i]>1)	optBalance *= mas.sell[i];
 	};
 	console.log('optimal balance', optBalance);
-
+	return ind;
 };
 
 var submitForm = function(flag) {	// submitForm(0) - Купить Crypto	submitForm(1) - Продать Crypto
@@ -124,8 +131,28 @@ var getArr = function(){
 		sellbuy.push([tm, Number(arr2[i4+2].replace(',','')), Number(arr2[i4+3].replace(',','')), elSell]);
 	};
 	// отфильтровать arr, оставив только новые метки времени
-	parseArr(sellbuy);
+	ind = parseArr(sellbuy);
+	if (ind != -1) {
+		//submitForm(ind);
+		if (ind){
+			// [800, 30, 0]
+			lastBal = [lastBal[1]*priceSell, 0, lastBal[1]*priceSell]; 									// submitForm(1) - Продать Crypto
+		}
+		else {
+			// [100, 0, 100]
+			// 0 undefined 1 NaN (3) [NaN, NaN, 0]
+			lastBal = [(lastBal[2] / priceBuy)*priceSell, lastBal[2] / priceBuy, 0]; 	// submitForm(0) - Купить Crypto
+		};
+	}
+	else {
+		// если в битках, то баланс пересчитываем
+		if (lastBal[1] && priceSellPrev) {
+			// [100000, 30, 0]
+			lastBal = [lastBal[1]*priceSell/priceSellPrev, lastBal[1], 0];
+		};
+	};
+	console.log(ind, priceSellPrev, priceSell, priceBuy, lastBal);
 };
 
 setInterval(getArr, 1000*60);
-getArr()
+getArr();
